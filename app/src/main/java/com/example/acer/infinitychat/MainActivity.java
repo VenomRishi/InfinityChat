@@ -3,6 +3,8 @@ package com.example.acer.infinitychat;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
@@ -20,9 +22,9 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth=FirebaseAuth.getInstance();
 
-        mToolbar=(Toolbar) findViewById(R.id.main_page_toolbar);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Infinity Chat");
+        //mToolbar=(Toolbar) findViewById(R.id.main_page_toolbar);
+        //setSupportActionBar(mToolbar);
+        //getSupportActionBar().setTitle("Infinity Chat");
     }
 
 
@@ -32,10 +34,32 @@ public class MainActivity extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser==null){
-            Intent start_intent=new Intent(MainActivity.this,StartActivity.class);
-            startActivity(start_intent);
-            finish();
+            sentToStart();
         }
     }
 
+    private void sentToStart() {
+        Intent start_intent=new Intent(MainActivity.this,StartActivity.class);
+        startActivity(start_intent);
+        finish();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+
+        getMenuInflater().inflate(R.menu.main_menu,menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+
+        if(item.getItemId()==R.id.main_logout_btn){
+            FirebaseAuth.getInstance().signOut();
+        }
+        return true;
+    }
 }
