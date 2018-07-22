@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-import android.widget.Toolbar;
+import android.support.v7.widget.Toolbar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,10 +22,11 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth=FirebaseAuth.getInstance();
 
-        //mToolbar=(Toolbar) findViewById(R.id.main_page_toolbar);
-        //setSupportActionBar(mToolbar);
-        //getSupportActionBar().setTitle("Infinity Chat");
+        mToolbar=(Toolbar) findViewById(R.id.main_page_toolbar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle("Infinity Chat");
     }
+
 
 
     @Override
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(item.getItemId()==R.id.main_logout_btn){
             FirebaseAuth.getInstance().signOut();
+            sentToStart();
         }
         return true;
     }
