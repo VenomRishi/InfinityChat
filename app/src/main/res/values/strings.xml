@@ -5,4 +5,9 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="log_out">Log Out</string>
+    <string name="your_email">Your Email</string>
+    <string name="already_have_account">ALREADY HAVE ACCOUNT</string>
+    <string name="welcome_to_infinity_chat_app">Welcome to Infinity Chat App</string>
+    <string name="login_to_your_account">Login to your account</string>
+    <string name="your_password">Password</string>
 </resources>
