@@ -1,0 +1,4 @@
+1) login and registration section
+2) account settings section
+3) all users display
+4) getting user display and getting friend request

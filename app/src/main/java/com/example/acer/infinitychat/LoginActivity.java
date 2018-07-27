@@ -14,9 +14,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -28,6 +32,7 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressDialog mLogDialog;
 
     private FirebaseAuth mAuth;
+    private DatabaseReference mDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +48,8 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         mLogDialog=new ProgressDialog(this);
+
+        mDatabaseReference= FirebaseDatabase.getInstance().getReference().child("Users");
 
         emailEditText=(EditText) findViewById(R.id.emailEditText);
         passwordEditText=(EditText) findViewById(R.id.passwordEditText);
@@ -74,10 +81,22 @@ public class LoginActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                   if (task.isSuccessful()){
                       mLogDialog.dismiss();
-                      Intent intent=new Intent(LoginActivity.this,MainActivity.class);
-                      intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                      startActivity(intent);
-                      finish();
+
+                      String current_user_id=mAuth.getCurrentUser().getUid();
+
+                      String deviceToken= FirebaseInstanceId.getInstance().getToken();
+
+                      mDatabaseReference.child(current_user_id).child("device_token").setValue(deviceToken).addOnSuccessListener(new OnSuccessListener<Void>() {
+                          @Override
+                          public void onSuccess(Void aVoid) {
+                              Intent intent=new Intent(LoginActivity.this,MainActivity.class);
+                              intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                              startActivity(intent);
+                              finish();
+                          }
+                      });
+
+
                   }
                   else {
                       mLogDialog.hide();
