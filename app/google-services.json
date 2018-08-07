@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "986959094756-3bq7f8bl99ugajfhsccaavjm1lrjsg2d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.acer.infinitychat",
+            "certificate_hash": "25189ee766e9b7663043524aca074a9d72144790"
+          }
+        },
+        {
           "client_id": "986959094756-pe4rpojcb6b9thq99mjdcmfqk0biao4f.apps.googleusercontent.com",
           "client_type": 3
         }
