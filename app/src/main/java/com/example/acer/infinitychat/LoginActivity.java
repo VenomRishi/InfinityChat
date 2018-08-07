@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,7 +28,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginButton;
     private Toolbar loginToolbar;
 
-    private ProgressDialog mLogDialog;
+    private ProgressDialog mLoginProgress;
 
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabaseReference;
@@ -47,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        mLogDialog=new ProgressDialog(this);
+        mLoginProgress =new ProgressDialog(this);
 
         mDatabaseReference= FirebaseDatabase.getInstance().getReference().child("Users");
 
@@ -63,10 +62,10 @@ public class LoginActivity extends AppCompatActivity {
                 String password=passwordEditText.getText().toString();
                 if(!TextUtils.isEmpty(email)||!TextUtils.isEmpty(password)){
 
-                    mLogDialog.setTitle("Logging in");
-                    mLogDialog.setMessage("Please wait while we check your credentials");
-                    mLogDialog.setCanceledOnTouchOutside(false);
-                    mLogDialog.show();
+                    mLoginProgress.setTitle("Logging in");
+                    mLoginProgress.setMessage("Please wait while we check your credentials");
+                    mLoginProgress.setCanceledOnTouchOutside(false);
+                    mLoginProgress.show();
                     loginUser(email, password);
                 }
 
@@ -80,7 +79,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                   if (task.isSuccessful()){
-                      mLogDialog.dismiss();
+                      mLoginProgress.dismiss();
 
                       String current_user_id=mAuth.getCurrentUser().getUid();
 
@@ -99,7 +98,7 @@ public class LoginActivity extends AppCompatActivity {
 
                   }
                   else {
-                      mLogDialog.hide();
+                      mLoginProgress.hide();
                       Toast.makeText(LoginActivity.this, "Cannot Sign in. Please check the form and try again", Toast.LENGTH_SHORT).show();
                   }
             }

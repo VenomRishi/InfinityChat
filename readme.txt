@@ -46,5 +46,9 @@ public static String random() {
 	replace %RESOURCE_DIR% in firebase.json
 	--> firebase deploy
 
+	npm install firebase-functions@latest firebase-admin@latest --save
+	npm install -g firebase-tools
+	event replace with context
 
-video number complete: 22
+
+video number complete: 24

@@ -53,7 +53,7 @@ public class ProfileActivity extends AppCompatActivity {
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(user_id);
         mFriendReqDatabase = FirebaseDatabase.getInstance().getReference().child("Friend_req");
         mFriendDatabase = FirebaseDatabase.getInstance().getReference().child("Friends");
-        mNotificationDatabase=FirebaseDatabase.getInstance().getReference().child("notification");
+        mNotificationDatabase=FirebaseDatabase.getInstance().getReference().child("notifications");
         mCurrent_user = FirebaseAuth.getInstance().getCurrentUser();
 
         mProfileImage = (ImageView) findViewById(R.id.profile_image);
@@ -70,6 +70,7 @@ public class ProfileActivity extends AppCompatActivity {
         mProgressDialog.setTitle("Loading User Data");
         mProgressDialog.setMessage("Please wait while we load the user data.");
         mProgressDialog.setCanceledOnTouchOutside(false);
+        mProgressDialog.show();
 
 
         mUsersDatabase.addValueEventListener(new ValueEventListener() {
@@ -85,6 +86,16 @@ public class ProfileActivity extends AppCompatActivity {
 
                 Picasso.with(ProfileActivity.this).load(image).placeholder(android.R.drawable.btn_default).into(mProfileImage);
 
+                if(mCurrent_user.getUid().equals(user_id)){
+
+                    mDeclineBtn.setEnabled(false);
+                    mDeclineBtn.setVisibility(View.INVISIBLE);
+
+                    mProfileSendReqBtn.setEnabled(false);
+                    mProfileSendReqBtn.setVisibility(View.INVISIBLE);
+
+                }
+
 
                 //-----------------------FRIENDS LIST/REQUEST FEATURE------------
                 mFriendReqDatabase.child(mCurrent_user.getUid())
@@ -96,6 +107,7 @@ public class ProfileActivity extends AppCompatActivity {
 
                                     String req_type = dataSnapshot.child(user_id)
                                             .child("request_type").getValue().toString();
+
                                     if (req_type.equals("received")) {
 
                                         mCurrent_state = "req_received";
@@ -181,6 +193,8 @@ public class ProfileActivity extends AppCompatActivity {
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
+
+
                                                         mCurrent_state = "req_sent";
                                                         mProfileSendReqBtn.setText("Cancel Friend Request");
 
