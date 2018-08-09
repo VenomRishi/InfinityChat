@@ -97,33 +97,27 @@ public class RegisterActivity extends AppCompatActivity {
                             String uid=current_user.getUid();
                             //root directory Users/uid
                             mDatabase=FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
-                            mDatabaseReference= FirebaseDatabase.getInstance().getReference().child("Users");
+
+                            String device_token=FirebaseInstanceId.getInstance().getToken();
+
                             HashMap<String ,String> userMap=new HashMap<>();
                             userMap.put("name",display_name);
                             userMap.put("status", "Hi there I am using Infinity Chat App.");
                             userMap.put("image","default");
                             userMap.put("thumb_image","default");
+                            userMap.put("device_token", device_token);
 
                             mDatabase.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if(task.isSuccessful()){
+
                                         mRegProgress.dismiss();
 
-                                        String current_user_id=mAuth.getCurrentUser().getUid();
-
-                                        String deviceToken= FirebaseInstanceId.getInstance().getToken();
-
-                                        mDatabaseReference.child(current_user_id).child("device_token").setValue(deviceToken).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                Intent mainIntent=new Intent(RegisterActivity.this,MainActivity.class);
-                                                mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                startActivity(mainIntent);
-                                                finish();
-                                            }
-                                        });
-
+                                        Intent mainIntent=new Intent(RegisterActivity.this,MainActivity.class);
+                                        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(mainIntent);
+                                        finish();
 
                                     }
                                 }

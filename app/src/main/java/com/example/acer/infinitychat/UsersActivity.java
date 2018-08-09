@@ -82,6 +82,7 @@ public class UsersActivity extends AppCompatActivity {
 
     }
 
+
     public static class UsersViewHolder extends RecyclerView.ViewHolder{
         View mView;
         public UsersViewHolder(View itemView) {

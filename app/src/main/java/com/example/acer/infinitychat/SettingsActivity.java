@@ -46,6 +46,9 @@ public class SettingsActivity extends AppCompatActivity {
     private DatabaseReference mUserDatabase;
     private FirebaseUser mCurrentUser;
 
+    private DatabaseReference mUserRef;
+    private FirebaseAuth mAuth;
+
     //Android Layout
 
     private CircleImageView mDisplayImage;
@@ -81,6 +84,10 @@ public class SettingsActivity extends AppCompatActivity {
 
         mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUid);
         mUserDatabase.keepSynced(true);
+
+        mAuth=FirebaseAuth.getInstance();
+        mUserRef= FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+
 
 
         mUserDatabase.addValueEventListener(new ValueEventListener() {
@@ -151,6 +158,20 @@ public class SettingsActivity extends AppCompatActivity {
                         */
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+            mUserRef.child("online").setValue(true);
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mUserRef.child("online").setValue(false);
     }
 
     @Override

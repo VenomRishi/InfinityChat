@@ -50,5 +50,8 @@ public static String random() {
 	npm install -g firebase-tools
 	event replace with context
 
+10) for icons
+	--> https://design.google/resources/
 
-video number complete: 24
+
+v number complete: 29
