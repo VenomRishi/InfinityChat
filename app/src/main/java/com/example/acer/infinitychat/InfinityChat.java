@@ -13,13 +13,13 @@ import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
 public class InfinityChat extends Application{
-
     private DatabaseReference mUserDatabase;
     private FirebaseAuth mAuth;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         /* Picasso */
@@ -31,20 +31,22 @@ public class InfinityChat extends Application{
         built.setLoggingEnabled(true);
         Picasso.setSingletonInstance(built);
 
-        mAuth=FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance();
 
-        if (mAuth.getCurrentUser()!=null){
-            mUserDatabase=FirebaseDatabase.getInstance()
-                    .getReference().child("Users")
-                    .child(mAuth.getCurrentUser().getUid());
+        if(mAuth.getCurrentUser() != null) {
+
+            mUserDatabase = FirebaseDatabase.getInstance()
+                    .getReference().child("Users").child(mAuth.getCurrentUser().getUid());
 
             mUserDatabase.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot!=null){
-                        mUserDatabase.child("online").onDisconnect().setValue(ServerValue.TIMESTAMP);
-                    }
 
+                    if (dataSnapshot != null) {
+
+                        mUserDatabase.child("online").onDisconnect().setValue(ServerValue.TIMESTAMP);
+
+                    }
 
                 }
 
@@ -53,8 +55,11 @@ public class InfinityChat extends Application{
 
                 }
             });
+
         }
 
 
     }
+
+
 }
