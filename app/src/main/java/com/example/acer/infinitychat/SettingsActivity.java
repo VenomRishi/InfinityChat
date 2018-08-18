@@ -1,12 +1,17 @@
 package com.example.acer.infinitychat;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -46,8 +51,6 @@ public class SettingsActivity extends AppCompatActivity {
     private DatabaseReference mUserDatabase;
     private FirebaseUser mCurrentUser;
 
-    private DatabaseReference mUserRef;
-    private FirebaseAuth mAuth;
 
     //Android Layout
 
@@ -58,12 +61,14 @@ public class SettingsActivity extends AppCompatActivity {
     private Button mStatusBtn;
     private Button mImageBtn;
 
+
     private static final int GALLERY_PICK = 1;
 
-    //Firebase Storage
+    // Storage Firebase
     private StorageReference mImageStorage;
 
     private ProgressDialog mProgressDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,22 +78,20 @@ public class SettingsActivity extends AppCompatActivity {
         mDisplayImage = (CircleImageView) findViewById(R.id.settings_image);
         mName = (TextView) findViewById(R.id.settings_name);
         mStatus = (TextView) findViewById(R.id.settings_status);
-        mStatusBtn = (Button) findViewById(R.id.changeStatusButton);
-        mImageBtn = (Button) findViewById(R.id.changeImageButton);
+
+        mStatusBtn = (Button) findViewById(R.id.settings_status_btn);
+        mImageBtn = (Button) findViewById(R.id.settings_image_btn);
 
         mImageStorage = FirebaseStorage.getInstance().getReference();
 
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
-        String currentUid = mCurrentUser.getUid();
+
+        String current_uid = mCurrentUser.getUid();
 
 
-        mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUid);
+
+        mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(current_uid);
         mUserDatabase.keepSynced(true);
-
-        mAuth=FirebaseAuth.getInstance();
-        mUserRef= FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
-
-
 
         mUserDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -102,12 +105,11 @@ public class SettingsActivity extends AppCompatActivity {
                 mName.setText(name);
                 mStatus.setText(status);
 
-                if (!image.equals("default")) {
+                if(!image.equals("default")) {
 
                     //Picasso.with(SettingsActivity.this).load(image).placeholder(R.drawable.default_avatar).into(mDisplayImage);
 
-                    Picasso.with(SettingsActivity.this).load(image)
-                            .networkPolicy(NetworkPolicy.OFFLINE)
+                    Picasso.with(SettingsActivity.this).load(image).networkPolicy(NetworkPolicy.OFFLINE)
                             .placeholder(R.drawable.default_avatar).into(mDisplayImage, new Callback() {
                         @Override
                         public void onSuccess() {
@@ -116,11 +118,14 @@ public class SettingsActivity extends AppCompatActivity {
 
                         @Override
                         public void onError() {
+
                             Picasso.with(SettingsActivity.this).load(image).placeholder(R.drawable.default_avatar).into(mDisplayImage);
+
                         }
-                    })
-                            ;
+                    });
+
                 }
+
 
             }
 
@@ -129,71 +134,74 @@ public class SettingsActivity extends AppCompatActivity {
 
             }
         });
+
+
         mStatusBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                String statusValue = mStatus.getText().toString();
+                String status_value = mStatus.getText().toString();
 
-                Intent statusIntent = new Intent(SettingsActivity.this, StatusActivity.class);
-                statusIntent.putExtra("key_status_value", statusValue);
-                startActivity(statusIntent);
+                Intent status_intent = new Intent(SettingsActivity.this, StatusActivity.class);
+                status_intent.putExtra("status_value", status_value);
+                startActivity(status_intent);
+
             }
         });
+
+
         mImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+
                 Intent galleryIntent = new Intent();
                 galleryIntent.setType("image/*");
                 galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+
                 startActivityForResult(Intent.createChooser(galleryIntent, "SELECT IMAGE"), GALLERY_PICK);
 
 
                 /*
-                // start picker to get image for cropping and then use the image in cropping activity
                 CropImage.activity()
                         .setGuidelines(CropImageView.Guidelines.ON)
                         .start(SettingsActivity.this);
                         */
+
             }
         });
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
 
-            mUserRef.child("online").setValue(true);
-
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mUserRef.child("online").setValue(false);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == GALLERY_PICK && resultCode == RESULT_OK) {
-            Uri imageUri = imageUri = data.getData();
+
+        if(requestCode == GALLERY_PICK && resultCode == RESULT_OK){
+
+            Uri imageUri = data.getData();
 
             CropImage.activity(imageUri)
                     .setAspectRatio(1, 1)
+                    .setMinCropWindowSize(500, 500)
                     .start(this);
-            //Toast.makeText(this, imageUri, Toast.LENGTH_LONG).show();
+
+            //Toast.makeText(SettingsActivity.this, imageUri, Toast.LENGTH_LONG).show();
+
         }
+
+
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
 
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
             if (resultCode == RESULT_OK) {
 
+
                 mProgressDialog = new ProgressDialog(SettingsActivity.this);
-                mProgressDialog.setTitle("Uploading image...");
-                mProgressDialog.setMessage("Please wait while we upload and process the image");
+                mProgressDialog.setTitle("Uploading Image...");
+                mProgressDialog.setMessage("Please wait while we upload and process the image.");
                 mProgressDialog.setCanceledOnTouchOutside(false);
                 mProgressDialog.show();
 
@@ -203,6 +211,7 @@ public class SettingsActivity extends AppCompatActivity {
                 File thumb_filePath = new File(resultUri.getPath());
 
                 String current_user_id = mCurrentUser.getUid();
+
 
                 Bitmap thumb_bitmap = new Compressor(this)
                         .setMaxWidth(200)
@@ -219,10 +228,12 @@ public class SettingsActivity extends AppCompatActivity {
                 final StorageReference thumb_filepath = mImageStorage.child("profile_images").child("thumbs").child(current_user_id + ".jpg");
 
 
+
                 filepath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        if (task.isSuccessful()) {
+
+                        if(task.isSuccessful()){
 
                             final String download_url = task.getResult().getDownloadUrl().toString();
 
@@ -233,36 +244,50 @@ public class SettingsActivity extends AppCompatActivity {
 
                                     String thumb_downloadUrl = thumb_task.getResult().getDownloadUrl().toString();
 
-                                    if (thumb_task.isSuccessful()) {
+                                    if(thumb_task.isSuccessful()){
 
-                                        Map update_hashMap = new HashMap<>();
+                                        Map update_hashMap = new HashMap();
                                         update_hashMap.put("image", download_url);
                                         update_hashMap.put("thumb_image", thumb_downloadUrl);
 
                                         mUserDatabase.updateChildren(update_hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
+
+                                                if(task.isSuccessful()){
+
                                                     mProgressDialog.dismiss();
-                                                    Toast.makeText(SettingsActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(SettingsActivity.this, "Success Uploading.", Toast.LENGTH_LONG).show();
+
                                                 }
+
                                             }
                                         });
+
+
                                     } else {
-                                        Toast.makeText(SettingsActivity.this, "Error in uploading thumbnail.", Toast.LENGTH_SHORT).show();
+
+                                        Toast.makeText(SettingsActivity.this, "Error in uploading thumbnail.", Toast.LENGTH_LONG).show();
                                         mProgressDialog.dismiss();
+
                                     }
+
 
                                 }
                             });
 
 
+
                         } else {
-                            Toast.makeText(SettingsActivity.this, "Error in uploading.", Toast.LENGTH_SHORT).show();
+
+                            Toast.makeText(SettingsActivity.this, "Error in uploading.", Toast.LENGTH_LONG).show();
                             mProgressDialog.dismiss();
+
                         }
+
                     }
                 });
+
 
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
@@ -271,18 +296,22 @@ public class SettingsActivity extends AppCompatActivity {
 
             }
         }
+
+
     }
 
-    //function for generation of random number 1-10
+
     public static String random() {
         Random generator = new Random();
         StringBuilder randomStringBuilder = new StringBuilder();
-        int randomLength = generator.nextInt(10);
+        int randomLength = generator.nextInt(20);
         char tempChar;
-        for (int i = 0; i < randomLength; i++) {
+        for (int i = 0; i < randomLength; i++){
             tempChar = (char) (generator.nextInt(96) + 32);
             randomStringBuilder.append(tempChar);
         }
         return randomStringBuilder.toString();
     }
+
+
 }
